@@ -57,7 +57,7 @@ def main():
     st.write(styled_df.to_html(escape=False), unsafe_allow_html=True)
 
     st.write("---")
-    st.subheader("Panduan Bergambar Simptom Ganoderma"
+    st.subheader("Panduan Bergambar Simptom Ganoderma")
 
     components.iframe("https://docs.google.com/presentation/d/e/2PACX-1vScJ2zNxKlYKmsZbJkDxOy3ht9knLu_RypRmhgFmdvs8TWGQEksY_F-Gvp20G3Vng/embed?start=false&loop=false&delayms=3000", height=432)
     
