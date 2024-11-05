@@ -221,25 +221,18 @@ def main():
     ax1.grid(True)
 
     # Bar plot showing yearly reduction
-    yearly_reduction_control = [abs(dirawat_yields[i] - dirawat_yields[i-1]) 
-                              for i in range(1, len(dirawat_yields))]
-    yearly_reduction_no_control = [abs(dibiar_yields[i] - dibiar_yields[i-1]) 
-                                 for i in range(1, len(dibiar_yields))]
-    
+    yearly_reduction_control = [(dirawat_yields[i-1] - dirawat_yields[i]) 
+                          for i in range(1, len(dirawat_yields))]
+
     x = years[1:]
     width = 0.35
-    ax2.bar([x - width/2 for x in x], yearly_reduction_control, width, 
-            label='Kawalan', color='green', alpha=0.6)
-    ax2.bar([x + width/2 for x in x], yearly_reduction_no_control, width, 
-            label='Tiada Kawalan', color='red', alpha=0.6)
+    ax2.bar([x - width/2 for x in x], yearly_reduction_control, width, label='Kawalan', color='green', alpha=0.6)
+    ax2.bar([x + width/2 for x in x], yearly_reduction_no_control, width, label='Tiada Kawalan', color='red', alpha=0.6)
     ax2.set_xlabel('Tahun')
     ax2.set_ylabel('Pengurangan Hasil (MT)')
     ax2.set_title('Pengurangan Hasil Tahunan')
     ax2.legend()
     ax2.grid(True)
-
-    plt.tight_layout()
-    st.pyplot(fig)
 
     st.write("---")
     st.success("Terima Kasih Kerana Menggunakan GUANO")
