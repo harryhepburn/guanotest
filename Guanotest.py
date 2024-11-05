@@ -222,7 +222,9 @@ def main():
 
     # Bar plot showing yearly reduction
     yearly_reduction_control = [(dirawat_yields[i-1] - dirawat_yields[i]) 
-                          for i in range(1, len(dirawat_yields))]
+                             for i in range(1, len(dirawat_yields))]
+    yearly_reduction_no_control = [(dibiar_yields[i-1] - dibiar_yields[i]) 
+                             for i in range(1, len(dibiar_yields))]
 
     x = years[1:]
     width = 0.35
