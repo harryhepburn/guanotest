@@ -109,7 +109,7 @@ def main():
     
     # [Previous census input code remains the same]
 
-    def main():
+def main():
     st.set_page_config(page_title="GUANO Calculator", page_icon="🌴", layout="wide")
     
     st.title("GUANO CALCULATOR")
