@@ -141,14 +141,14 @@ def main():
     total_cost = cost_a + cost_b_c
 
     col6, col7, col8 = st.columns(3)
-    col6.metric("Kos 'Soil Mounding'", f"RM {cost_a:.2f}")
+    col6.metric("Kos _Soil Mounding_", f"RM {cost_a:.2f}")
     col7.metric("Kos Sanitasi Pokok", f"RM {cost_b_c:.2f}")
     col8.metric("Jumlah Kos", f"RM {total_cost:.2f}")
 
     st.write("---")
     st.subheader("Anggaran Kerugian Hasil")
 
-    hargaBTS = st.number_input("Harga BTS (RM/MT)", min_value=0.0, value=840.0)
+    hargaBTS = st.number_input("Harga BTS (RM/MT)", min_value=0.0, value=800.0)
     tahuntuai = st.number_input("Tahun Tuai", min_value=1, max_value=25, value=10)
 
     kerugian1 = (sanitasi * 0.18) + (serangan_a * 0.8)
