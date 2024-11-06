@@ -126,8 +126,8 @@ def main():
 
     colx, col3, col4, col5 = st.columns(4)
     colx.metric("Jumlah Pokok Sihat", pokok_sihat)
-    col3.metric("Jumlah Pokok Tidak Sihat", pokok_sakit)
-    col4.metric("Pokok Memerlukan 'Soil Mounding'", serangan_a)
+    col3.metric("Jumlah Pokok Sakit", pokok_sakit)
+    col4.metric("Pokok Memerlukan _Soil Mounding_", serangan_a)
     col5.metric("Pokok Memerlukan Sanitasi", sanitasi)
 
     st.write("---")
