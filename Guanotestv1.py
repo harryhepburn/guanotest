@@ -66,7 +66,7 @@ def predict_disease_progression(hasilsemasa, tahuntuai, total_palms, infected_pa
 def main():
     st.set_page_config(page_title="GUANO Calculator", page_icon="🌴", layout="wide")
     
-    st.title("GUANO")
+    st.title("GUANO CALCULATOR")
     st.subheader("Kalkulator Kos Rawatan Ganoderma")
 
     st.write("### Kategori Jangkitan Ganoderma:")
