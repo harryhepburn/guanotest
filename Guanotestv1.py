@@ -240,6 +240,85 @@ def main():
     plt.tight_layout()
     st.pyplot(fig)
 
+
+    # Modified Cost-Benefit Analysis section
+    st.write("---")
+    st.subheader("Analisis Kos-Faedah")
+
+    hargaBTS = st.number_input("Harga BTS Semasa (RM/MT)", min_value=0.0, value=840.0)
+    
+    # Calculate yield losses using the prediction data
+    yearly_loss_control = [d - c for c, d in zip(dirawat_yields, dibiar_yields)]
+    cumulative_loss_5yr = sum(yearly_loss_control[:5])  # First 5 years of losses
+    
+    kerugianRM = hargaBTS * cumulative_loss_5yr
+    bezarugi = kerugianRM - total_cost
+
+    # Display results in columns
+    col_loss1, col_loss2, col_loss3 = st.columns(3)
+    col_loss1.metric("Anggaran Kehilangan BTS (5 Tahun)", f"{cumulative_loss_5yr:.2f} MT")
+    col_loss2.metric("Kerugian dalam RM", f"RM {kerugianRM:.2f}")
+    col_loss3.metric("Perbezaan Kos-Kerugian", f"RM {abs(bezarugi):.2f}")
+
+    # Show detailed year-by-year analysis
+    st.write("#### Analisis Kerugian Tahunan")
+    
+    yearly_data = pd.DataFrame({
+        'Tahun': years[:5],  # First 5 years
+        'Kehilangan BTS (MT/Ha)': [round(loss, 2) for loss in yearly_loss_control[:5]],
+        'Kerugian (RM)': [round(loss * hargaBTS, 2) for loss in yearly_loss_control[:5]]
+    })
+    
+    st.write(yearly_data)
+
+    # Show cost-benefit analysis message
+    if kerugianRM > total_cost:
+        st.success(f"""
+        💰 Rawatan adalah BERBALOI kerana:
+        - Kos rawatan (RM {total_cost:.2f}) adalah lebih rendah berbanding anggaran kerugian 5 tahun (RM {kerugianRM:.2f})
+        - Potensi penjimatan sebanyak RM {bezarugi:.2f} dalam tempoh 5 tahun dengan melakukan rawatan
+        - Purata penjimatan tahunan: RM {(bezarugi/5):.2f}
+        """)
+    else:
+        st.warning(f"""
+        ⚠️ Pertimbangkan semula kos rawatan kerana:
+        - Kos rawatan (RM {total_cost:.2f}) adalah lebih tinggi berbanding anggaran kerugian 5 tahun (RM {kerugianRM:.2f})
+        - Kos tambahan sebanyak RM {abs(bezarugi):.2f} diperlukan untuk rawatan
+        - Purata kerugian tahunan: RM {abs(bezarugi/5):.2f}
+        """)
+
+    # Enhanced visualization
+    fig_cost = plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    labels = ['Kos Rawatan', 'Kerugian 5 Tahun']
+    values = [total_cost, kerugianRM]
+    colors = ['#2ecc71' if kerugianRM > total_cost else '#e74c3c', '#3498db']
+    
+    plt.bar(labels, values, color=colors)
+    plt.title('Perbandingan Kos Rawatan vs Kerugian 5 Tahun')
+    plt.ylabel('RM')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    
+    # Add value labels on top of each bar
+    for i, v in enumerate(values):
+        plt.text(i, v, f'RM {v:,.2f}', ha='center', va='bottom')
+
+    # Add yearly loss trend
+    plt.subplot(1, 2, 2)
+    years_plot = years[:5]
+    yearly_losses = [loss * hargaBTS for loss in yearly_loss_control[:5]]
+    plt.plot(years_plot, yearly_losses, marker='o', color='#3498db', linewidth=2)
+    plt.fill_between(years_plot, yearly_losses, alpha=0.3, color='#3498db')
+    plt.title('Trend Kerugian Tahunan')
+    plt.xlabel('Tahun')
+    plt.ylabel('Kerugian (RM)')
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+    plt.tight_layout()
+    st.pyplot(fig_cost)
+
+
+    
     # Credits
     st.write("---")
     st.success("Terima Kasih Kerana Menggunakan GUANO")
