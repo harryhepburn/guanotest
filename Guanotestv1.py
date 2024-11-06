@@ -5,65 +5,111 @@ import numpy as np
 import streamlit.components.v1 as components
 from datetime import datetime
 
-def calculate_weather_factor():
-    # Get current month for seasonal adjustment
-    current_month = datetime.now().month
-    # Monsoon season adjustment (adjust these months according to your location)
-    monsoon_months = [11, 12, 1, 2]  # Example monsoon months
-    if current_month in monsoon_months:
-        return 0.7  # Higher spread rate during monsoon
-    return 0.5
-
-def calculate_age_factor(tahuntuai):
-    # Age-based susceptibility factor
-    if tahuntuai < 5:
-        return 0.3  # Young palms are less susceptible
-    elif tahuntuai < 10:
-        return 0.5  # Mid-age palms
-    else:
-        return 0.7  # Older palms are more susceptible
-
-def calculate_infection_pressure(total_palms, infected_palms):
-    # Calculate infection pressure based on current infection density
-    infection_ratio = infected_palms / total_palms if total_palms > 0 else 0
-    return min(0.8, infection_ratio * 1.2)  # Cap at 80% maximum pressure
-
-def predict_disease_progression(hasilsemasa, tahuntuai, total_palms, infected_palms, years, rainfall, soil_condition, is_controlled=True):
-    weather_factor = calculate_weather_factor()
-    age_factor = calculate_age_factor(tahuntuai)
-    infection_pressure = calculate_infection_pressure(total_palms, infected_palms)
-    
-    # Adjust for rainfall and soil condition
-    rainfall_factor = min(1.0, rainfall / 250)  # Normalize rainfall effect
-    soil_factors = {
-        "Sangat Baik": 0.7,
-        "Baik": 0.8,
-        "Sederhana": 0.9,
-        "Kurang Baik": 1.0
+def get_rainfall_factor(condition):
+    rainfall_factors = {
+        "Wet (>200mm/month)": 1.0,
+        "Moderate (100-200mm/month)": 0.8,
+        "Dry (<100mm/month)": 0.6
     }
-    soil_factor = soil_factors.get(soil_condition, 0.8)
-    
-    # Base reduction rates
-    if is_controlled:
-        base_reduction = 0.1 * (1 + weather_factor) * age_factor * infection_pressure * soil_factor * rainfall_factor
+    return rainfall_factors.get(condition, 0.8)
+
+def get_soil_factor(soil_class):
+    soil_factors = {
+        "Class 1 (Best)": 1.0,
+        "Class 2 (Moderate)": 0.85,
+        "Class 3 (Poor)": 0.7
+    }
+    return soil_factors.get(soil_class, 0.85)
+
+def calculate_base_yield_potential(age, trees_per_hectare, soil_class):
+    # Base yield calculation considering tree density and soil class
+    if age < 4:
+        return 0  # Immature phase
+    elif age < 8:
+        base = 25 * get_soil_factor(soil_class)  # Young mature
+    elif age < 15:
+        base = 30 * get_soil_factor(soil_class)  # Prime age
     else:
-        base_reduction = 0.6 * (1 + weather_factor) * age_factor * infection_pressure * soil_factor * rainfall_factor
+        base = 28 * get_soil_factor(soil_class)  # Older palms
     
-    # Calculate yearly yields with dynamic reduction
-    yields = [hasilsemasa]
-    current_yield = hasilsemasa
+    # Adjust for tree density
+    optimal_density = 136  # optimal trees per hectare
+    density_factor = min(1.2, trees_per_hectare / optimal_density)
+    
+    return base * density_factor
+
+def predict_disease_progression(current_yield, age, total_palms, infected_palms, years, 
+                              rainfall_condition, soil_class, trees_per_hectare, is_controlled=True):
+    # Get environmental factors
+    rainfall_factor = get_rainfall_factor(rainfall_condition)
+    soil_factor = get_soil_factor(soil_class)
+    
+    # Calculate infection pressure
+    infection_ratio = infected_palms / total_palms if total_palms > 0 else 0
+    infection_pressure = min(0.8, infection_ratio * 1.2)
+    
+    # Calculate age-based susceptibility
+    age_factor = min(1.0, (age / 15) * 0.8)
+    
+    # Base reduction rates based on academic studies
+    if is_controlled:
+        base_reduction = 0.08 * infection_pressure * rainfall_factor * soil_factor * age_factor
+    else:
+        base_reduction = 0.15 * infection_pressure * rainfall_factor * soil_factor * age_factor
+    
+    yields = [current_yield]
+    potential_yields = []
     
     for year in range(len(years)):
-        # Adjust reduction rate based on cumulative effect
-        cumulative_factor = 1 + (year * 0.05)  # Increases impact over time
-        adjusted_reduction = min(0.9, base_reduction * cumulative_factor)  # Cap at 90% reduction
+        # Calculate potential yield without disease
+        potential_yield = calculate_base_yield_potential(age + year, trees_per_hectare, soil_class)
+        potential_yields.append(potential_yield)
+        
+        # Calculate actual yield with disease impact
+        cumulative_factor = 1 + (year * 0.03)  # Progressive disease impact
+        adjusted_reduction = min(0.9, base_reduction * cumulative_factor)
+        
+        if is_controlled:
+            # Controlled scenario: slower decline and partial recovery possible
+            recovery_factor = 0.02 * year if year > 2 else 0
+            adjusted_reduction = max(0, adjusted_reduction - recovery_factor)
         
         current_yield *= (1 - adjusted_reduction)
-        yields.append(max(current_yield, hasilsemasa * 0.1))  # Ensure yield doesn't go below 10% of initial
+        # Ensure yield doesn't fall below 10% of potential
+        current_yield = max(current_yield, potential_yield * 0.1)
+        yields.append(current_yield)
     
-    return yields[1:]  # Remove initial yield
+    return yields[1:], potential_yields
 
 def main():
+    st.set_page_config(page_title="Enhanced GUANO Calculator", page_icon="🌴", layout="wide")
+    
+    # [Previous code for categories and visual guide remains the same until the analysis section]
+    
+    st.write("---")
+    st.subheader("Maklumat Ladang")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        trees_per_hectare = st.number_input("Bilangan Pokok Per Hektar", 
+                                          min_value=100, max_value=160, value=136)
+        current_yield = st.number_input("Hasil Semasa (MT/Hektar/Tahun)", 
+                                      min_value=0.0, value=20.0)
+    
+    with col2:
+        rainfall_condition = st.selectbox("Keadaan Hujan",
+                                        ["Wet (>200mm/month)", 
+                                         "Moderate (100-200mm/month)",
+                                         "Dry (<100mm/month)"])
+        soil_class = st.selectbox("Kelas Tanah",
+                                ["Class 1 (Best)", 
+                                 "Class 2 (Moderate)", 
+                                 "Class 3 (Poor)"])
+    
+    # [Previous census input code remains the same]
+
+    def main():
     st.set_page_config(page_title="GUANO Calculator", page_icon="🌴", layout="wide")
     
     st.title("GUANO CALCULATOR")
@@ -144,102 +190,67 @@ def main():
     col6.metric("Kos _Soil Mounding_", f"RM {cost_a:.2f}")
     col7.metric("Kos Sanitasi Pokok", f"RM {cost_b_c:.2f}")
     col8.metric("Jumlah Kos", f"RM {total_cost:.2f}")
-
-    st.write("---")
-    st.subheader("Anggaran Kerugian Hasil")
-
-    hargaBTS = st.number_input("Harga BTS (RM/MT)", min_value=0.0, value=800.0)
-    tahuntuai = st.number_input("Tahun Tuai", min_value=1, max_value=25, value=10)
-
-    kerugian1 = (sanitasi * 0.18) + (serangan_a * 0.8)
-    kerugianRM = hargaBTS * kerugian1
     
-    col9, col10 = st.columns(2)
-    col9.metric("Kerugian Hasil Berat BTS", f"{kerugian1:.2f} MT")
-    col10.metric("Kerugian Hasil BTS", f"RM {kerugianRM:.2f}")
-
-    bezarugi = kerugianRM - total_cost
-    if kerugianRM > total_cost:
-        st.info(f"Jumlah kos adalah kurang daripada kerugian sebanyak RM {bezarugi:.2f}")
-    else:
-        st.warning(f"Jumlah kos adalah lebih daripada kerugian sebanyak RM {abs(bezarugi):.2f}")
-
     st.write("---")
     st.subheader("Anggaran Hasil")
-
-    hasilsemasa = (0.1 * serangan_a) + (0.1 * serangan_d) + (0.18 * serangan_e) + (0.15 * serangan_f)
-    st.metric("Hasil Semasa", f"{hasilsemasa:.2f} MT/Tahun")
-
-    # Weather condition input
-    st.write("### Faktor Cuaca dan Persekitaran")
-    rainfall = st.slider("Purata Hujan Bulanan (mm)", 0, 500, 250)
-    soil_condition = st.selectbox("Keadaan Tanah", 
-                                ["Sangat Baik", "Baik", "Sederhana", "Kurang Baik"],
-                                index=1)
-
+    
     tahuntuai1 = tahuntuai + 1
     years = list(range(tahuntuai1, 26))
-
+    
     # Calculate yields with improved prediction model
-    dirawat_yields = predict_disease_progression(
-        hasilsemasa, tahuntuai, total_palms, pokok_sakit, 
-        years, rainfall, soil_condition, is_controlled=True
+    dirawat_yields, potential_yields = predict_disease_progression(
+        current_yield, tahuntuai, total_palms, pokok_sakit,
+        years, rainfall_condition, soil_class, trees_per_hectare, is_controlled=True
     )
     
-    dibiar_yields = predict_disease_progression(
-        hasilsemasa, tahuntuai, total_palms, pokok_sakit, 
-        years, rainfall, soil_condition, is_controlled=False
+    dibiar_yields, _ = predict_disease_progression(
+        current_yield, tahuntuai, total_palms, pokok_sakit,
+        years, rainfall_condition, soil_class, trees_per_hectare, is_controlled=False
     )
-
+    
     # Create DataFrame for display
     df = pd.DataFrame({
         'Tahun': years,
-        'Kawalan (MT)': [round(y, 2) for y in dirawat_yields],
-        'Tiada Kawalan (MT)': [round(y, 2) for y in dibiar_yields]
+        'Potensi Hasil (MT/Ha)': [round(y, 2) for y in potential_yields],
+        'Dengan Kawalan (MT/Ha)': [round(y, 2) for y in dirawat_yields],
+        'Tanpa Kawalan (MT/Ha)': [round(y, 2) for y in dibiar_yields]
     })
-
+    
     st.write(df)
-    st.write('''
-    Nota: Anggaran pengurangan hasil berdasarkan:
-    - Tekanan jangkitan semasa
-    - Umur pokok
-    - Keadaan cuaca
-    - Faktor persekitaran
-    - Kepadatan jangkitan
-    ''')
-
+    
     # Enhanced visualization
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
     
-    # Line plot
-    ax1.plot(years, dirawat_yields, label='Kawalan', color='green', marker='o')
-    ax1.plot(years, dibiar_yields, label='Tiada Kawalan', color='red', marker='o')
+    # Line plot with potential yield
+    ax1.plot(years, potential_yields, label='Potensi Hasil', color='blue', linestyle='--')
+    ax1.plot(years, dirawat_yields, label='Dengan Kawalan', color='green', marker='o')
+    ax1.plot(years, dibiar_yields, label='Tanpa Kawalan', color='red', marker='o')
     ax1.set_xlabel('Tahun')
-    ax1.set_ylabel('Hasil (MT)')
-    ax1.set_title('Perbandingan Hasil Antara Kawalan dan Tiada Kawalan')
+    ax1.set_ylabel('Hasil (MT/Ha)')
+    ax1.set_title('Perbandingan Hasil')
     ax1.legend()
     ax1.grid(True)
-
-    # Bar plot showing yearly reduction
-    yearly_reduction_control = [abs(dirawat_yields[i] - dirawat_yields[i-1]) 
-                              for i in range(1, len(dirawat_yields))]
-    yearly_reduction_no_control = [abs(dibiar_yields[i] - dibiar_yields[i-1]) 
-                                 for i in range(1, len(dibiar_yields))]
     
-    x = years[1:]
+    # Yield loss visualization
+    potential_loss_control = [p - d for p, d in zip(potential_yields, dirawat_yields)]
+    potential_loss_no_control = [p - d for p, d in zip(potential_yields, dibiar_yields)]
+    
+    x = years
     width = 0.35
-    ax2.bar([x - width/2 for x in x], yearly_reduction_control, width, 
-            label='Kawalan', color='green', alpha=0.6)
-    ax2.bar([x + width/2 for x in x], yearly_reduction_no_control, width, 
-            label='Tiada Kawalan', color='red', alpha=0.6)
+    ax2.bar([x - width/2 for x in x], potential_loss_control, width,
+            label='Kehilangan Dengan Kawalan', color='green', alpha=0.6)
+    ax2.bar([x + width/2 for x in x], potential_loss_no_control, width,
+            label='Kehilangan Tanpa Kawalan', color='red', alpha=0.6)
     ax2.set_xlabel('Tahun')
-    ax2.set_ylabel('Pengurangan Hasil (MT)')
-    ax2.set_title('Pengurangan Hasil Tahunan')
+    ax2.set_ylabel('Kehilangan Hasil (MT/Ha)')
+    ax2.set_title('Kehilangan Hasil Berbanding Potensi')
     ax2.legend()
     ax2.grid(True)
-
+    
     plt.tight_layout()
     st.pyplot(fig)
+    
+    # [Rest of the code remains the same]
 
     st.write("---")
     st.success("Terima Kasih Kerana Menggunakan GUANO")
@@ -252,6 +263,8 @@ def main():
     - #SEGALANYA FELDA
     """)
 
-
 if __name__ == "__main__":
     main()
+
+
+
