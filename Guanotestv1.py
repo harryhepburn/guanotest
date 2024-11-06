@@ -131,13 +131,13 @@ def main():
     
     with col2:
         rainfall_condition = st.selectbox("Keadaan Hujan",
-                                        ["Wet (>200mm/month)", 
-                                         "Moderate (100-200mm/month)",
-                                         "Dry (<100mm/month)"])
+                                        ["Basah (>200mm/month)", 
+                                         "Sederhana (100-200mm/month)",
+                                         "Kering (<100mm/month)"])
         soil_class = st.selectbox("Kelas Tanah",
-                                ["Class 1 (Best)", 
-                                 "Class 2 (Moderate)", 
-                                 "Class 3 (Poor)"])
+                                ["Kelas 1", 
+                                 "Kelas 2", 
+                                 "Kelas 3"])
 
     # Census section
     st.write("---")
