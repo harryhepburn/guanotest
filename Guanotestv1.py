@@ -82,42 +82,13 @@ def predict_disease_progression(current_yield, age, total_palms, infected_palms,
     return yields[1:], potential_yields
 
 def main():
-    st.set_page_config(page_title="Enhanced GUANO Calculator", page_icon="🌴", layout="wide")
-    
-    # [Previous code for categories and visual guide remains the same until the analysis section]
-    
-    st.write("---")
-    st.subheader("Maklumat Ladang")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        trees_per_hectare = st.number_input("Bilangan Pokok Per Hektar", 
-                                          min_value=100, max_value=160, value=136)
-        current_yield = st.number_input("Hasil Semasa (MT/Hektar/Tahun)", 
-                                      min_value=0.0, value=20.0)
-    
-    with col2:
-        rainfall_condition = st.selectbox("Keadaan Hujan",
-                                        ["Wet (>200mm/month)", 
-                                         "Moderate (100-200mm/month)",
-                                         "Dry (<100mm/month)"])
-        soil_class = st.selectbox("Kelas Tanah",
-                                ["Class 1 (Best)", 
-                                 "Class 2 (Moderate)", 
-                                 "Class 3 (Poor)"])
-    
-    # [Previous census input code remains the same]
-
-def main():
     st.set_page_config(page_title="GUANO Calculator", page_icon="🌴", layout="wide")
     
     st.title("GUANO CALCULATOR")
     st.subheader("Kalkulator Kos Rawatan Ganoderma")
 
+    # Categories section
     st.write("### Kategori Jangkitan Ganoderma:")
-
-    # Create a DataFrame for the categories
     df_categories = pd.DataFrame({
         'Kategori': ['A', 'B', 'C', 'D', 'E', 'F'],
         'Deskripsi': [
@@ -130,7 +101,6 @@ def main():
         ]
     })
 
-    # Apply styling to the DataFrame
     styled_df = df_categories.style.set_properties(**{
         'text-align': 'left',
         'padding': '10px',
@@ -140,29 +110,51 @@ def main():
         {'selector': 'td', 'props': [('text-align', 'left')]}
     ]).apply(lambda x: ['background-color: #D3D3D3' if i%2==0 else '' for i in range(len(x))], axis=0)
 
-    # Display the styled DataFrame
     st.write(styled_df.to_html(escape=False), unsafe_allow_html=True)
 
+    # Visual guide
     st.write("---")
     st.subheader("Panduan Bergambar Simptom Ganoderma")
-
     components.iframe("https://docs.google.com/presentation/d/e/2PACX-1vScJ2zNxKlYKmsZbJkDxOy3ht9knLu_RypRmhgFmdvs8TWGQEksY_F-Gvp20G3Vng/embed?start=false&loop=false&delayms=3000", height=432)
     
+    # Farm Information
+    st.write("---")
+    st.subheader("Maklumat Ladang")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        trees_per_hectare = st.number_input("Bilangan Pokok Per Hektar", 
+                                          min_value=100, max_value=160, value=136)
+        current_yield = st.number_input("Hasil Semasa (MT/Hektar/Tahun)", 
+                                      min_value=0.0, value=20.0)
+        tahuntuai = st.number_input("Umur Sawit (Tahun)", min_value=1, max_value=25, value=10)
+    
+    with col2:
+        rainfall_condition = st.selectbox("Keadaan Hujan",
+                                        ["Wet (>200mm/month)", 
+                                         "Moderate (100-200mm/month)",
+                                         "Dry (<100mm/month)"])
+        soil_class = st.selectbox("Kelas Tanah",
+                                ["Class 1 (Best)", 
+                                 "Class 2 (Moderate)", 
+                                 "Class 3 (Poor)"])
+
+    # Census section
     st.write("---")
     st.subheader("Bancian")
 
-    col1, col2 = st.columns(2)
-
-    with col1:
+    col3, col4 = st.columns(2)
+    with col3:
         serangan_a = st.number_input("Bilangan Pokok Kategori A", min_value=0, value=0)
         serangan_b = st.number_input("Bilangan Pokok Kategori B", min_value=0, value=0)
         serangan_c = st.number_input("Bilangan Pokok Kategori C", min_value=0, value=0)
 
-    with col2:
+    with col4:
         serangan_d = st.number_input("Bilangan Pokok Kategori D", min_value=0, value=0)
         serangan_e = st.number_input("Bilangan Pokok Kategori E", min_value=0, value=0)
         serangan_f = st.number_input("Bilangan Pokok Kategori F", min_value=0, value=0)
 
+    # Analysis results
     st.write("---")
     st.subheader("Hasil Analisis")
     pokok_sakit = serangan_a + serangan_b + serangan_c + serangan_d + serangan_f
@@ -170,12 +162,13 @@ def main():
     pokok_sihat = serangan_e
     total_palms = pokok_sakit + pokok_sihat
 
-    colx, col3, col4, col5 = st.columns(4)
-    colx.metric("Jumlah Pokok Sihat", pokok_sihat)
-    col3.metric("Jumlah Pokok Sakit", pokok_sakit)
-    col4.metric("Pokok Memerlukan _Soil Mounding_", serangan_a)
-    col5.metric("Pokok Memerlukan Sanitasi", sanitasi)
+    col5, col6, col7, col8 = st.columns(4)
+    col5.metric("Jumlah Pokok Sihat", pokok_sihat)
+    col6.metric("Jumlah Pokok Sakit", pokok_sakit)
+    col7.metric("Pokok Memerlukan _Soil Mounding_", serangan_a)
+    col8.metric("Pokok Memerlukan Sanitasi", sanitasi)
 
+    # Cost calculation
     st.write("---")
     st.subheader("Pengiraan Kos")
 
@@ -186,18 +179,17 @@ def main():
     cost_b_c = sanitasi * cost_sanitasi
     total_cost = cost_a + cost_b_c
 
-    col6, col7, col8 = st.columns(3)
-    col6.metric("Kos _Soil Mounding_", f"RM {cost_a:.2f}")
-    col7.metric("Kos Sanitasi Pokok", f"RM {cost_b_c:.2f}")
-    col8.metric("Jumlah Kos", f"RM {total_cost:.2f}")
-    
+    col9, col10, col11 = st.columns(3)
+    col9.metric("Kos _Soil Mounding_", f"RM {cost_a:.2f}")
+    col10.metric("Kos Sanitasi Pokok", f"RM {cost_b_c:.2f}")
+    col11.metric("Jumlah Kos", f"RM {total_cost:.2f}")
+
+    # Yield prediction
     st.write("---")
     st.subheader("Anggaran Hasil")
     
-    tahuntuai1 = tahuntuai + 1
-    years = list(range(tahuntuai1, 26))
+    years = list(range(tahuntuai + 1, 26))
     
-    # Calculate yields with improved prediction model
     dirawat_yields, potential_yields = predict_disease_progression(
         current_yield, tahuntuai, total_palms, pokok_sakit,
         years, rainfall_condition, soil_class, trees_per_hectare, is_controlled=True
@@ -208,20 +200,19 @@ def main():
         years, rainfall_condition, soil_class, trees_per_hectare, is_controlled=False
     )
     
-    # Create DataFrame for display
-    df = pd.DataFrame({
+    # Results display
+    df_results = pd.DataFrame({
         'Tahun': years,
         'Potensi Hasil (MT/Ha)': [round(y, 2) for y in potential_yields],
         'Dengan Kawalan (MT/Ha)': [round(y, 2) for y in dirawat_yields],
         'Tanpa Kawalan (MT/Ha)': [round(y, 2) for y in dibiar_yields]
     })
     
-    st.write(df)
+    st.write(df_results)
     
-    # Enhanced visualization
+    # Visualizations
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
     
-    # Line plot with potential yield
     ax1.plot(years, potential_yields, label='Potensi Hasil', color='blue', linestyle='--')
     ax1.plot(years, dirawat_yields, label='Dengan Kawalan', color='green', marker='o')
     ax1.plot(years, dibiar_yields, label='Tanpa Kawalan', color='red', marker='o')
@@ -231,15 +222,14 @@ def main():
     ax1.legend()
     ax1.grid(True)
     
-    # Yield loss visualization
     potential_loss_control = [p - d for p, d in zip(potential_yields, dirawat_yields)]
     potential_loss_no_control = [p - d for p, d in zip(potential_yields, dibiar_yields)]
     
-    x = years
     width = 0.35
-    ax2.bar([x - width/2 for x in x], potential_loss_control, width,
+    x = np.array(years)
+    ax2.bar(x - width/2, potential_loss_control, width,
             label='Kehilangan Dengan Kawalan', color='green', alpha=0.6)
-    ax2.bar([x + width/2 for x in x], potential_loss_no_control, width,
+    ax2.bar(x + width/2, potential_loss_no_control, width,
             label='Kehilangan Tanpa Kawalan', color='red', alpha=0.6)
     ax2.set_xlabel('Tahun')
     ax2.set_ylabel('Kehilangan Hasil (MT/Ha)')
@@ -249,12 +239,10 @@ def main():
     
     plt.tight_layout()
     st.pyplot(fig)
-    
-    # [Rest of the code remains the same]
 
+    # Credits
     st.write("---")
     st.success("Terima Kasih Kerana Menggunakan GUANO")
-
     st.write("""
     - Dibangunkan oleh Team KIK Wilayah Raja Alias: **BIANGLALA** 
     - Ahli Kumpulan: Rafizan, Haslina, Izzati, Noorain, Baizura, Farah, Andi, dan Amilin
@@ -265,6 +253,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
