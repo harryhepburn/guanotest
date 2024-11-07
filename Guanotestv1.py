@@ -168,7 +168,7 @@ def main():
     # Create pie chart using matplotlib
     total = sum(data.values())
     if total > 0:  # Only show chart if there's data
-        plt.figure(figsize=(2, 0.8))
+        plt.figure(figsize=(0.6, 0.8))
         plt.pie(data.values(), labels=data.keys(), autopct='%1.1f%%')
         plt.title('Taburan Kategori')
         st.pyplot(plt)
