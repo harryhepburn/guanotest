@@ -174,8 +174,7 @@ def main():
         plt.title('Taburan Kategori')
         st.pyplot(plt)
         plt.close()
-            )
-            st.plotly_chart(fig)
+          
     
     # Analysis results
     st.write("---")
