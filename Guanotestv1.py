@@ -166,16 +166,7 @@ def main():
         'Kategori F': serangan_f
     }
 
-    # Create pie chart using matplotlib
-    total = sum(data.values())
-    if total > 0:  # Only show chart if there's data
-        plt.figure(figsize=(6, 4))
-        plt.pie(data.values(), labels=data.keys(), autopct='%1.1f%%')
-        plt.title('Taburan Kategori')
-        st.pyplot(plt)
-        plt.close()
-
-    
+   
     # Create pie chart using plotly
     total = sum(data.values())
     if total > 0:  # Only show chart if there's data
