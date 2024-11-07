@@ -2,6 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import 
 import streamlit.components.v1 as components
 from datetime import datetime
 
@@ -155,7 +156,6 @@ def main():
         serangan_f = st.number_input("Bilangan Pokok Kategori F", min_value=0, value=0)
 
     
-
     # Create data for pie chart
     data = {
         'Kategori A': serangan_a,
@@ -166,16 +166,16 @@ def main():
         'Kategori F': serangan_f
     }
 
-    # Create pie chart using Streamlit's built-in plotting
+    # Create pie chart using matplotlib
     total = sum(data.values())
     if total > 0:  # Only show chart if there's data
-        fig = px.pie(
-            values=list(data.values()),
-            names=list(data.keys()),
-            title='Taburan Kategori',
-            labels={'label': 'Kategori', 'value': 'Bilangan Pokok'}
-        )
-        st.plotly_chart(fig)
+        plt.figure(figsize=(10, 8))
+        plt.pie(data.values(), labels=data.keys(), autopct='%1.1f%%')
+        plt.title('Taburan Kategori')
+        st.pyplot(plt)
+        plt.close()
+            )
+            st.plotly_chart(fig)
     
     # Analysis results
     st.write("---")
