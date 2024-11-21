@@ -11,7 +11,7 @@ def about_page():
     col1, col2 = st.columns([1, 2])
     
     with col1:
-        st.image("https://www.sawitsetara.co/wp-content/uploads/2023/08/Jamur-Ganoderma-tumbuh-pada-pangkal-batang-tanaman-sawit.jpg", height=300)
+        st.image("https://www.sawitsetara.co/wp-content/uploads/2023/08/Jamur-Ganoderma-tumbuh-pada-pangkal-batang-tanaman-sawit.jpg", width=300)
     
     with col2:
         st.markdown("""
@@ -30,7 +30,7 @@ def about_page():
     
     st.subheader("Our Team: BIANGLALA")
     
-    components.iframe("https://docs.google.com/presentation/d/e/2PACX-1vS4bQV1ybHEoxF-9zlP3Wgd3XkLUEgTs6TG3tEbBg5D9NHNHO8R0qJjByEmF0WI29ZB-tTVjGxDNG8Q/embed?start=false&loop=false&delayms=3000", width=432)
+    components.iframe("https://docs.google.com/presentation/d/e/2PACX-1vS4bQV1ybHEoxF-9zlP3Wgd3XkLUEgTs6TG3tEbBg5D9NHNHO8R0qJjByEmF0WI29ZB-tTVjGxDNG8Q/embed?start=false&loop=false&delayms=3000", height=432)
     
     
     team_members = [
