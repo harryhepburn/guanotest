@@ -29,7 +29,7 @@ def about_page():
     st.write("---")
     
     st.subheader("Our Team: BIANGLALA")
-    st.image("https://drive.google.com/file/d/1gGb_YZsOMh4STD1h6xDXroJtPQv42JK4/view?usp=sharing", width=200)
+    components.iframe("https://drive.google.com/file/d/1gGb_YZsOMh4STD1h6xDXroJtPQv42JK4/view?usp=sharing", width=200)
     
     
     team_members = [
