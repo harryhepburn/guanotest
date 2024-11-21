@@ -11,7 +11,7 @@ def about_page():
     col1, col2 = st.columns([1, 2])
     
     with col1:
-        st.image("https://raw.githubusercontent.com/Andi-getch/icons/main/ganoderma-icon.png", width=200)
+        st.image("https://www.sawitsetara.co/wp-content/uploads/2023/08/Jamur-Ganoderma-tumbuh-pada-pangkal-batang-tanaman-sawit.jpg", width=200)
     
     with col2:
         st.markdown("""
