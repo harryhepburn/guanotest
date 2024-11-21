@@ -165,8 +165,165 @@ def main():
         )
         st.plotly_chart(fig)
     
-    # Rest of the code remains the same as in the original script
-    # ... [keep the rest of the main() function unchanged]
+    st.write("---")
+    st.subheader("Hasil Analisis")
+    pokok_sakit = serangan_a + serangan_b + serangan_c + serangan_d + serangan_f
+    sanitasi = serangan_b + serangan_c
+    pokok_sihat = serangan_e
+
+    colx, col3, col4, col5 = st.columns(4)
+    colx.metric("Jumlah Pokok Sihat", pokok_sihat)
+    col3.metric("Jumlah Pokok Tidak Sihat", pokok_sakit)
+    col4.metric("Pokok Memerlukan _Soil Mounding_", serangan_a)
+    col5.metric("Pokok Memerlukan Sanitasi", sanitasi)
+
+    st.write("---")
+    st.subheader("Pengiraan Kos")
+
+    cost_soil_mounding = st.number_input("Kos _Soil Mounding_ per pokok (RM)", min_value=0.0, value=20.0)
+    cost_sanitasi = st.number_input("Kos Sanitasi per pokok (RM)", min_value=0.0, value=35.0)
+
+    cost_a = serangan_a * cost_soil_mounding
+    cost_b_c = sanitasi * cost_sanitasi
+    total_cost = cost_a + cost_b_c
+
+    col6, col7, col8 = st.columns(3)
+    col6.metric("Kos _Soil Mounding_", f"RM {cost_a:.2f}")
+    col7.metric("Kos Sanitasi Pokok", f"RM {cost_b_c:.2f}")
+    col8.metric("Jumlah Kos", f"RM {total_cost:.2f}")
+
+    st.write("---")
+    st.subheader("Anggaran Kerugian Hasil")
+
+    hargaBTS = st.number_input("Harga BTS (RM/MT)", min_value=0.0, value=840.0)
+    tahuntuai = st.number_input("Tahun Tuai", min_value=1, max_value=25, value=10)
+
+    kerugian1 = (sanitasi * 0.18) + (serangan_a * 0.8)
+    kerugianRM = hargaBTS * kerugian1
+    
+    col9, col10 = st.columns(2)
+    col9.metric("Kerugian Hasil Berat BTS", f"{kerugian1:.2f} MT")
+    col10.metric("Kerugian Hasil BTS", f"RM {kerugianRM:.2f}")
+
+    bezarugi = kerugianRM - total_cost
+    if kerugianRM > total_cost:
+        st.info(f"Jumlah kos adalah kurang daripada kerugian sebanyak RM {bezarugi:.2f}")
+    else:
+        st.warning(f"Jumlah kos adalah lebih daripada kerugian sebanyak RM {abs(bezarugi):.2f}")
+
+    st.write("---")
+    st.subheader("Anggaran Hasil")
+
+    hasilsemasa = (0.1 * serangan_a) + (0.1 * serangan_d) + (0.18 * serangan_e) + (0.15 * serangan_f)
+    st.metric("Hasil Semasa", f"{hasilsemasa:.2f} MT/Tahun")
+
+    dirawat_yield = hasilsemasa
+    dibiar_yield = hasilsemasa
+    dirawat_reduction = 0.05
+    dibiar_reduction = 0.2
+
+    tahuntuai1 = tahuntuai + 1
+    years = list(range(tahuntuai1, 26))
+    dirawat_yields = []
+    dibiar_yields = []
+
+    for year in years:
+        dirawat_yield *= (1 - dirawat_reduction)
+        dibiar_yield *= (1 - dibiar_reduction)
+        dirawat_yields.append(dirawat_yield)
+        dibiar_yields.append(dibiar_yield)
+
+    df = pd.DataFrame({
+        'Tahun': years,
+        'Kawalan (MT)': dirawat_yields,
+        'Tiada Kawalan (MT)': dibiar_yields
+    })
+
+    
+    st.write(df)
+    st.write('Nota: Andaian pengurangan hasil sehingga 20% setahun jika dibiar tanpa kawalan dan 5% jika dikawal.')
+
+    #fig, ax = plt.subplots(figsize=(4, 2.5))
+    #ax.plot(years, dirawat_yields, label='Kawalan', color='green', marker='x', markersize=4, linewidth=1.5)
+    #ax.plot(years, dibiar_yields, label='Tiada Kawalan', color='red', marker='o', markersize=4, linewidth=1.5)
+    ##ax.set_xlabel('Tahun', fontsize=8)
+    #ax.set_ylabel('Hasil (MT)', fontsize=8)
+    #ax.set_title('Perbandingan Hasil Antara Kawalan dan Tiada Kawalan', fontsize=9)
+    #ax.legend(fontsize=7)
+    #ax.grid(True, linestyle='--', alpha=0.7)
+    #ax.tick_params(axis='both', labelsize=7)  # Make tick labels smaller
+
+    # Adjust layout to prevent label cutoff
+    #plt.tight_layout()
+    
+    #st.pyplot(fig)
+
+    #####
+    
+    
+
+    # Create the figure
+    fig = go.Figure()
+
+    # Add traces for both lines
+    fig.add_trace(
+        go.Scatter(
+            x=years, 
+            y=dirawat_yields, 
+            name='Kawalan',
+            line=dict(color='green', width=2),
+            mode='lines+markers',
+            marker=dict(symbol='x', size=6)
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=years, 
+            y=dibiar_yields, 
+            name='Tiada Kawalan',
+            line=dict(color='red', width=2),
+            mode='lines+markers',
+            marker=dict(symbol='circle', size=6)
+        )
+    )
+
+    # Update layout
+    fig.update_layout(
+        title=dict(
+            text='Perbandingan Hasil Antara Kawalan dan Tiada Kawalan',
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+            font=dict(size=14)
+        ),
+        xaxis_title='Tahun',
+        yaxis_title='Hasil (MT)',
+        width=500,    
+        height=300,   
+        showlegend=True,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="right",
+            x=0.99
+        ),
+        margin=dict(l=50, r=50, t=50, b=50),
+        template='plotly_white',
+        plot_bgcolor='white'
+        )
+
+    # Add grid
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+
+    # Display in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+    ###
+
+    st.write("---")
+    st.success("Terima Kasih Kerana Menggunakan GUANO")
+
 
 if __name__ == "__main__":
     main()
