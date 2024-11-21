@@ -29,7 +29,8 @@ def about_page():
     st.write("---")
     
     st.subheader("Our Team: BIANGLALA")
-    components.iframe("https://docs.google.com/presentation/d/e/2PACX-1vS4bQV1ybHEoxF-9zlP3Wgd3XkLUEgTs6TG3tEbBg5D9NHNHO8R0qJjByEmF0WI29ZB-tTVjGxDNG8Q/pub?start=true&loop=false&delayms=3000", width=432)
+    
+    components.iframe("https://docs.google.com/presentation/d/e/2PACX-1vS4bQV1ybHEoxF-9zlP3Wgd3XkLUEgTs6TG3tEbBg5D9NHNHO8R0qJjByEmF0WI29ZB-tTVjGxDNG8Q/embed?start=false&loop=false&delayms=3000", width=432)
     
     
     team_members = [
