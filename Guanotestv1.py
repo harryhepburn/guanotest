@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import streamlit.components.v1 as components
 
 def about_page():
-    st.header("🍄 GUANO Calculator - Ganoderma Management Tool")
+    st.header("🍄 GUANO Calculator - Kalkulator Kos Rawatan Ganoderma")
     
     col1, col2 = st.columns([1, 2])
     
@@ -15,20 +15,19 @@ def about_page():
     
     with col2:
         st.markdown("""
-        ### About the Project
-        GUANO Calculator is an innovative tool designed to help plantation managers 
-        assess and manage Ganoderma infections in oil palm plantations.
+        ### Projek Kami
+        GUANO Calculator adalah alat inovatif yang direka untuk membantu pengurusan ladang
+        menilai dan mengurus jangkitan Ganoderma di ladang.
 
-        #### Key Features:
-        - 📊 Categorize palm tree health status
-        - 💰 Estimate treatment costs
-        - 📈 Predict yield loss
-        - 🌴 Comprehensive analysis
+        #### Fungsi Utama:
+        - 📊 Membuat bancian Ganoderma
+        - 💰 Menganggarkan kos kawalan
+        - 📈 Menjangkakan kehilangan hasil
         """)
     
     st.write("---")
     
-    st.subheader("Our Team: BIANGLALA")
+    st.subheader("Pasukan Kami: BIANGLALA")
     
     components.iframe("https://docs.google.com/presentation/d/e/2PACX-1vS4bQV1ybHEoxF-9zlP3Wgd3XkLUEgTs6TG3tEbBg5D9NHNHO8R0qJjByEmF0WI29ZB-tTVjGxDNG8Q/embed?start=false&loop=false&delayms=3000", height=432)
     
@@ -45,7 +44,7 @@ def about_page():
     
     st.write("---")
     
-    st.subheader("Advisors")
+    st.subheader("Penyelaras")
     st.markdown("""
     - Ariff
     - Zamri
@@ -64,21 +63,21 @@ def main():
     # Sidebar for navigation
     st.sidebar.title("🍄 GUANO Calculator")
     menu = st.sidebar.radio(
-        "Navigate", 
-        ["Calculator", "About", "Help"], 
+        "Navigasi", 
+        ["Kalkulator", "Info", "Bantuan"], 
         index=0
     )
     
-    if menu == "About":
+    if menu == "Info":
         about_page()
         return
     
-    elif menu == "Help":
-        st.header("🆘 Help & Guide")
+    elif menu == "Bantuan":
+        st.header("🆘 Panduan")
         st.markdown("""
-        ### How to Use GUANO Calculator
+        ### Cara Menggunakan GUANO Calculator
         
-        1. **Kategorize Palm Trees**
+        1. **Membuat Bancian**
            - Input the number of palm trees in each health category (A-F)
            - Refer to the category descriptions below
         
