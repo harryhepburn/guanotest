@@ -214,7 +214,7 @@ def main():
     else:
         st.warning(f"Jumlah kos adalah lebih daripada kerugian sebanyak RM {abs(bezarugi):,.2f}")
 
-def main():
+
     # [Previous code remains the same until the Anggaran Hasil section]
     
     st.write("---")
