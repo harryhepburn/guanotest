@@ -78,20 +78,20 @@ def main():
         ### Cara Menggunakan GUANO Calculator
         
         1. **Membuat Bancian**
-           - Input the number of palm trees in each health category (A-F)
-           - Refer to the category descriptions below
+           - Masukkan bilangan pokok sawit mengikut kategori (A-F)
+           - Rujuk panduan bergambar sekiranya keliru semasa membuat bancian
         
-        2. **Cost Estimation**
-           - Set the cost for Soil Mounding and Sanitization
-           - Calculate total treatment costs
+        2. **Anggaran Kos**
+           - Masukkan kos per pokok bagi kerja sanitasi dan _soil mounding_
+           - Kos akan dikira secara automatik berdasarkan bilangan pokok mengikut kategori
         
-        3. **Yield Loss Estimation**
-           - Input current BTS price
-           - Specify harvest year
-           - See potential yield loss and financial impact
+        3. **Anggaran Kehilangan Hasil**
+           - Masukkan harga BTS
+           - Tentukan umur pokok
+           - Lihat keputusan untuk menganggar kehilangan hasil dan kesan kewangan
         """)
         
-        st.info("For detailed guidance, check the pictorial guide in the main calculator page.")
+        st.info("Untuk maklumat lanjut berkaitan serangan Ganoderma, rujuk maklumat bergambar di halaman utama.")
         return
     
     # Main Calculator Page
