@@ -214,15 +214,6 @@ def main():
     else:
         st.warning(f"Jumlah kos adalah lebih daripada kerugian sebanyak RM {abs(bezarugi):,.2f}")
 
-import streamlit as st
-import matplotlib.pyplot as plt
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import streamlit.components.v1 as components
-
-# [Previous code remains the same until the Anggaran Hasil section]
-
 def main():
     # [Previous code remains the same until the Anggaran Hasil section]
     
