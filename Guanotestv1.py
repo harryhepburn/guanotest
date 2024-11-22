@@ -191,9 +191,9 @@ def main():
     total_cost = cost_a + cost_b_c
 
     col6, col7, col8 = st.columns(3)
-    col6.metric("Kos _Soil Mounding_", f"RM {cost_a:.2f}")
-    col7.metric("Kos Sanitasi Pokok", f"RM {cost_b_c:.2f}")
-    col8.metric("Jumlah Kos", f"RM {total_cost:.2f}")
+    col6.metric("Kos _Soil Mounding_", f"RM {cost_a:,.2f}")
+    col7.metric("Kos Sanitasi Pokok", f"RM {cost_b_c:,.2f}")
+    col8.metric("Jumlah Kos", f"RM {total_cost:,.2f}")
 
     st.write("---")
     st.subheader("Anggaran Kerugian Hasil")
@@ -205,14 +205,14 @@ def main():
     kerugianRM = hargaBTS * kerugian1
     
     col9, col10 = st.columns(2)
-    col9.metric("Kerugian Hasil Berat BTS", f"{kerugian1:.2f} MT")
-    col10.metric("Kerugian Hasil BTS", f"RM {kerugianRM:.2f}")
+    col9.metric("Kerugian Hasil Berat BTS", f"{kerugian1:,.2f} MT")
+    col10.metric("Kerugian Hasil BTS", f"RM {kerugianRM:,.2f}")
 
     bezarugi = kerugianRM - total_cost
     if kerugianRM > total_cost:
-        st.info(f"Jumlah kos adalah kurang daripada kerugian sebanyak RM {bezarugi:.2f}")
+        st.info(f"Jumlah kos adalah kurang daripada kerugian sebanyak RM {bezarugi:,.2f}")
     else:
-        st.warning(f"Jumlah kos adalah lebih daripada kerugian sebanyak RM {abs(bezarugi):.2f}")
+        st.warning(f"Jumlah kos adalah lebih daripada kerugian sebanyak RM {abs(bezarugi):,.2f}")
 
     st.write("---")
     st.subheader("Anggaran Hasil")
