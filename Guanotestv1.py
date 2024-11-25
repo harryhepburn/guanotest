@@ -371,25 +371,18 @@ def main():
     openai.api_key = "sk-svcacct-dWx8MNRB9A5z2G-D2nEpxwqOkT8hdz7RK9RSTI6JJQET74aXtt2-_BtKo1cafkD3T3BlbkFJ9QfEAvPjFrI3ClMEfzXPUNt0k6QmBklDjJq5nirr8v30toLuNohYmPbusFKcEDwA"
 
     # Streamlit App
-    st.title("AI Assistant - Powered by OpenAI")
-
-    # Sidebar for instructions
-    st.sidebar.title("Instructions")
-    st.sidebar.info("""
-    1. Type your query into the input box.
-    2. Press "Submit" to get a response.
-    """)
+    st.title("Guano AI")
 
     # Main Chat Interface
-    st.subheader("Chat with GPT")
+    st.subheader("Tuliskan soalan anda")
     
     # Input box for user queries
     user_input = st.text_input("Enter your message:", "", key="user_input")
 
-    if st.button("Submit"):
+    if st.button("Hantar"):
         if user_input.strip():
             # Call OpenAI API
-            with st.spinner("Thinking..."):
+            with st.spinner("Berfikir..."):
                 try:
                     response = openai.ChatCompletion.create(
                         model="gpt-3.5-turbo",
@@ -399,7 +392,7 @@ def main():
                     )
                     # Display the assistant's response
                     assistant_message = response['choices'][0]['message']['content']
-                    st.success("Assistant's Response:")
+                    st.success("Jawapan:")
                     st.write(assistant_message)
                 except Exception as e:
                     st.error(f"Error: {e}")
