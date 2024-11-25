@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit.components.v1 as components
+import openai
 
 def about_page():
     st.header("🍄 GUANO Calculator - Kalkulator Kos Rawatan Ganoderma")
@@ -364,6 +365,26 @@ def main():
     else:
         st.warning("⚠️ Sila semak semula strategi kawalan dan kos untuk mengoptimumkan pulangan pelaburan")
 
+
+
+    # Set up OpenAI API key
+    openai.api_key = "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"
+
+    # Streamlit app layout
+    st.title("Chat with GPT")
+    user_input = st.text_input("Ask a question:")
+
+    if st.button("Submit"):
+        if user_input:
+            # Call GPT-3.5 API
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": user_input}],
+                max_tokens=150,
+            )
+            st.write(response['choices'][0]['message']['content'])
+        else:
+            st.write("Please enter a question!")
 
 
     st.write("---")
