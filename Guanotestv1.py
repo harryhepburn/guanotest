@@ -374,10 +374,10 @@ def main():
     st.title("Guano AI")
 
     # Main Chat Interface
-    st.subheader("Tuliskan soalan anda")
+    st.subheader("Ada pertanyaan lanjut? Guano AI sedia membantu.")
     
     # Input box for user queries
-    user_input = st.text_input("Enter your message:", "", key="user_input")
+    user_input = st.text_input("Tuliskan Soalan Anda", "", key="user_input")
 
     if st.button("Hantar"):
         if user_input.strip():
