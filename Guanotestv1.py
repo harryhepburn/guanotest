@@ -368,7 +368,7 @@ def main():
 
 
     # Initialize OpenAI API Key
-    openai.api_key = "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"
+    openai.api_key = "sk-svcacct-dWx8MNRB9A5z2G-D2nEpxwqOkT8hdz7RK9RSTI6JJQET74aXtt2-_BtKo1cafkD3T3BlbkFJ9QfEAvPjFrI3ClMEfzXPUNt0k6QmBklDjJq5nirr8v30toLuNohYmPbusFKcEDwA"
 
     # Streamlit App
     st.title("AI Assistant - Powered by OpenAI")
