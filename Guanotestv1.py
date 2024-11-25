@@ -367,24 +367,44 @@ def main():
 
 
 
-    # Set up OpenAI API key
+    # Initialize OpenAI API Key
     openai.api_key = "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"
 
-    # Streamlit app layout
-    st.title("Chat with GPT")
-    user_input = st.text_input("Ask a question:")
+    # Streamlit App
+    st.title("AI Assistant - Powered by OpenAI")
+
+    # Sidebar for instructions
+    st.sidebar.title("Instructions")
+    st.sidebar.info("""
+    1. Type your query into the input box.
+    2. Press "Submit" to get a response.
+    """)
+
+    # Main Chat Interface
+    st.subheader("Chat with GPT")
+    
+    # Input box for user queries
+    user_input = st.text_input("Enter your message:", "", key="user_input")
 
     if st.button("Submit"):
-        if user_input:
-            # Call GPT-3.5 API
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": user_input}],
-                max_tokens=150,
-            )
-            st.write(response['choices'][0]['message']['content'])
+        if user_input.strip():
+            # Call OpenAI API
+            with st.spinner("Thinking..."):
+                try:
+                    response = openai.ChatCompletion.create(
+                        model="gpt-3.5-turbo",
+                        messages=[{"role": "user", "content": user_input}],
+                        max_tokens=150,
+                        temperature=0.7,
+                    )
+                    # Display the assistant's response
+                    assistant_message = response['choices'][0]['message']['content']
+                    st.success("Assistant's Response:")
+                    st.write(assistant_message)
+                except Exception as e:
+                    st.error(f"Error: {e}")
         else:
-            st.write("Please enter a question!")
+            st.warning("Please enter a message.")
 
 
     st.write("---")
