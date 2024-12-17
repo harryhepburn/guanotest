@@ -3,7 +3,7 @@ import streamlit as st
 
 # Data for the table
 data = {
-    "Kelas Tanah": ["Kelas 1 (Sangat sesuai)"] * 2 + ["Kelas 2 (Sesuai)"] * 28 + ["Kelas 3 (Kurang sesuai)"] * 30,
+    
     "Jenis Tanah": [
         "SELANGOR", "KANGKONG", "BRIAH", "TELONG", "SEGAMAT", "KUANTAN", "BENTA", "SK. MAS", "KATONG", "SABAK",
         "YONG PENG", "TOM YONG", "KEMUNING", "JERANGAU", "JEMBANG", "JELAI", "CHAMP", "MUSANG", "SEMPAKA",
