@@ -68,6 +68,18 @@ def create_performance_trend_chart(year_data):
     
     return fig
     
+def get_topography_table():
+    data = {
+        "TOPOGRAFI": ["Beralun Lemah", "Beralun Sederhana", "Berbukit"],
+        "KOD": ["G", "M", "H"],
+        "KETERANGAN": [
+            "Kurang Daripada Empat (4) Darjah", 
+            "Lima (5) Hingga Dua Belas (12) Darjah", 
+            "Melebihi Dua Belas (12) Darjah"
+        ]
+    }
+    return pd.DataFrame(data)
+    
 def main():
     st.title('Palm Oil Site Yield Potential (SYP) Calculator')
     
@@ -130,6 +142,11 @@ def main():
                 """)
         else:
             st.error('No matching data found. Please adjust your parameters.')
+
+    # Display Topography Table
+    st.subheader("Maklumat Topografi")
+    topo_df = get_topography_table()
+    st.dataframe(topo_df)
     
     # Footer
     st.markdown('### Developed by Rafizan Samian - FELDA Strategy & Transformation Department')
