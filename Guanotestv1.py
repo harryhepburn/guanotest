@@ -1,242 +1,144 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-import plotly.graph_objs as go
+from datetime import datetime, timedelta
 
-# Load the datasets
-@st.cache_data
-def load_data():
-    data = pd.read_csv('SYP.csv')
-    return data
+def calculate_forecast(black_bunches, bunch_weight, palms, distribution_fractions, loss_rate=0):
+    """
+    Calculate crop forecast using the Ulu Bernam method:
+    t_n = b * w_n * p * f_n * (1-l)
+    where:
+    t_n = output in tonnes in month n after black bunch count
+    b = black bunches per palm
+    w_n = expected bunch weight in month n
+    p = number of palms
+    f_n = fraction expected to be ripe in month n
+    l = loss factor
+    """
+    forecast = []
+    for n in range(4):
+        tonnes = (black_bunches * bunch_weight * palms * distribution_fractions[n] * 
+                 (1 - loss_rate)) / 1000  # Convert kg to tonnes
+        forecast.append(tonnes)
+    return forecast
 
-@st.cache_data
-def load_soil_class_data():
-    data = pd.read_csv('KELASTANAH.csv')
-    return data
-
-def predict_syp(df, rainfall_zone, soil_class, topography, year):
-    """
-    Predict Site Yield Potential based on input parameters
-    """
-    # Validate inputs
-    filtered_df = df[
-        (df['Zon Taburan Hujan'] == rainfall_zone) & 
-        (df['Kelas Tanah'] == soil_class) & 
-        (df['Topografi'] == topography)
-    ]
-    
-    if filtered_df.empty:
-        return None
-    
-    # Find closest year or interpolate
-    closest_year_row = filtered_df.iloc[(filtered_df['Tahun Tuai'] - year).abs().argsort()[:1]]
-    
-    return closest_year_row['Potensi Hasil'].values[0]
-
-def create_performance_trend_chart(year_data):
-    """
-    Create an interactive Plotly line chart for performance trend
-    """
-    # Create interactive Plotly line chart
-    fig = px.line(
-        year_data, 
-        x='Tahun Tuai', 
-        y='Potensi Hasil',
-        title='Performance Trend',
-        labels={
-            'Tahun Tuai': 'Planting Year',
-            'Potensi Hasil': 'Site Yield Potential (metric tons/hectare)'
-        },
-        markers=True
-    )
-    
-    # Customize hover template
-    fig.update_traces(
-        hovertemplate='<b>Planting Year</b>: %{x}<br><b>Yield Potential</b>: %{y:.2f} metric tons/hectare<extra></extra>',
-        line=dict(width=3),
-        marker=dict(size=8)
-    )
-    
-    # Adjust layout for better readability
-    fig.update_layout(
-        hovermode='closest',
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=12,
-            font_family="Arial"
-        ),
-        xaxis_title='Planting Year',
-        yaxis_title='Site Yield Potential (metric tons/hectare)',
-        height=450
-    )
-    
-    return fig
-    
 def main():
-    st.title('Palm Oil Site Yield Potential (SYP) Calculator')
-    
-    # Create tabs
-    tab1, tab2, tab3 = st.tabs([
-        'SYP Calculator', 
-        'Soil Classification Lookup', 
-        'Performance Trend'
-    ])
-    
-    # Load datasets
-    df = load_data()
-    soil_class_df = load_soil_class_data()
-    
-    with tab1:
-        # Create columns for input
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            # Rainfall Zone Selection
-            rainfall_zones = df['Zon Taburan Hujan'].unique()
-            rainfall_zone = st.selectbox('Rainfall Zone', rainfall_zones)
-        
-        with col2:
-            # Soil Class Selection
-            soil_classes = df['Kelas Tanah'].unique()
-            soil_class = st.selectbox('Soil Class', soil_classes)
-        
-        with col3:
-            # Topography Selection
-            topographies = df['Topografi'].unique()
-            topography = st.selectbox('Topography', topographies)
-        
-        # Year Selection
-        max_year = df['Tahun Tuai'].max()
-        min_year = df['Tahun Tuai'].min()
-        year = st.slider('Planting Year', min_value=min_year, max_value=max_year, value=min_year)
-        
-        # Calculate Button
-        if st.button('Calculate Site Yield Potential'):
-            syp = predict_syp(df, rainfall_zone, soil_class, topography, year)
-            
-            if syp is not None:
-                st.success(f'Estimated Site Yield Potential: {syp:.2f} metric tons per hectare')
-                
-                # Additional Visualization with Plotly
-                year_data = df[
-                    (df['Zon Taburan Hujan'] == rainfall_zone) & 
-                    (df['Kelas Tanah'] == soil_class) & 
-                    (df['Topografi'] == topography)
-                ]
-                
-                # Optional: Add some additional insights
-                if not year_data.empty:
-                    min_yield = year_data['Potensi Hasil'].min()
-                    max_yield = year_data['Potensi Hasil'].max()
-                    avg_yield = year_data['Potensi Hasil'].mean()
-                    
-                    st.markdown(f"""
-                    ### Yield Insights
-                    - **Minimum Yield**: {min_yield:.2f} metric tons/hectare
-                    - **Maximum Yield**: {max_yield:.2f} metric tons/hectare
-                    - **Average Yield**: {avg_yield:.2f} metric tons/hectare
-                    """)
-            else:
-                st.error('No matching data found. Please adjust your parameters.')
-    
-    with tab2:
-        st.header('Soil Classification Lookup')
-        
-        # Create columns for filtering
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            # Kelas Tanah Filter
-            kelas_tanah_options = ['All'] + list(soil_class_df['Kelas Tanah'].unique())
-            selected_kelas_tanah = st.selectbox('Soil Class', kelas_tanah_options)
-        
-        with col2:
-            # Jenis Tanah Filter
-            jenis_tanah_options = ['All'] + list(soil_class_df['Jenis Tanah'].unique())
-            selected_jenis_tanah = st.selectbox('Soil Type', jenis_tanah_options)
-        
-        with col3:
-            # Kod Filter
-            kod_options = ['All'] + list(soil_class_df['Kod'].unique())
-            selected_kod = st.selectbox('Soil Code', kod_options)
-        
-        with col4:
-            # Kumpulan Filter
-            kumpulan_options = ['All'] + list(map(str, soil_class_df['Kumpulan'].unique()))
-            selected_kumpulan = st.selectbox('Group', kumpulan_options)
-        
-        # Apply Filters
-        filtered_df = soil_class_df.copy()
-        
-        if selected_kelas_tanah != 'All':
-            filtered_df = filtered_df[filtered_df['Kelas Tanah'] == selected_kelas_tanah]
-        
-        if selected_jenis_tanah != 'All':
-            filtered_df = filtered_df[filtered_df['Jenis Tanah'] == selected_jenis_tanah]
-        
-        if selected_kod != 'All':
-            filtered_df = filtered_df[filtered_df['Kod'] == selected_kod]
-        
-        if selected_kumpulan != 'All':
-            filtered_df = filtered_df[filtered_df['Kumpulan'] == int(selected_kumpulan)]
-        
-        # Display Filtered Results
-        st.dataframe(filtered_df, use_container_width=True)
-        
-        # Summary Statistics
-        st.subheader('Summary')
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            st.metric('Total Entries', len(filtered_df))
-        
-        with col2:
-            st.metric('Unique Soil Classes', filtered_df['Kelas Tanah'].nunique())
-        
-        with col3:
-            st.metric('Unique Soil Types', filtered_df['Jenis Tanah'].nunique())
-        
-        with col4:
-            st.metric('Unique Groups', filtered_df['Kumpulan'].nunique())
-    
-    with tab3:
-        st.header('Performance Trend Visualization')
-        
-        # Performance Trend Chart Selection
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            # Rainfall Zone Selection for Trend
-            rainfall_zones = df['Zon Taburan Hujan'].unique()
-            trend_rainfall_zone = st.selectbox('Rainfall Zone', rainfall_zones, key='trend_rainfall')
-        
-        with col2:
-            # Soil Class Selection for Trend
-            soil_classes = df['Kelas Tanah'].unique()
-            trend_soil_class = st.selectbox('Soil Class', soil_classes, key='trend_soil_class')
-        
-        with col3:
-            # Topography Selection for Trend
-            topographies = df['Topografi'].unique()
-            trend_topography = st.selectbox('Topography', topographies, key='trend_topography')
-        
-        # Filter data for trend
-        trend_data = df[
-            (df['Zon Taburan Hujan'] == trend_rainfall_zone) & 
-            (df['Kelas Tanah'] == trend_soil_class) & 
-            (df['Topografi'] == trend_topography)
-        ]
-        
-        # Create and display Plotly chart
-        if not trend_data.empty:
-            fig = create_performance_trend_chart(trend_data)
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.error('No data available for the selected parameters.')
-    
-    # Footer
-    st.markdown('### Developed by Rafizan Samian - FELDA Strategy & Transformation Department')
+    st.title("Oil Palm Black Bunch Count (BBC) Forecast")
+    st.write("""
+    This application implements the Ulu Bernam method for crop forecasting based on black bunch counts.
+    It provides a 4-month forecast of expected oil palm production.
+    """)
 
-if __name__ == '__main__':
+    # Sidebar for input parameters
+    st.sidebar.header("Survey Parameters")
+    
+    # Block information
+    total_blocks = st.sidebar.number_input("Total number of blocks", min_value=1, value=50)
+    survey_block_ratio = st.sidebar.selectbox(
+        "Survey block ratio (1 in X blocks)",
+        options=[5, 10],
+        help="Typically 1 in 5 blocks are surveyed"
+    )
+    
+    row_sampling_ratio = st.sidebar.selectbox(
+        "Row sampling ratio (1 in X rows)",
+        options=[20],
+        help="Typically every 20th row is surveyed (5% of palms)"
+    )
+
+    # Basic block parameters
+    st.header("Block Parameters")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        palms_per_block = st.number_input("Palms per block", min_value=100, value=136)
+        palm_age = st.number_input("Palm age (years after planting)", min_value=3, value=7)
+    
+    with col2:
+        bunch_weight = st.number_input("Average bunch weight (kg)", min_value=1.0, value=15.0)
+        loss_rate = st.number_input("Loss rate (%)", min_value=0.0, max_value=100.0, value=0.0) / 100
+
+    # BBC Survey Data
+    st.header("BBC Survey Data")
+    
+    survey_blocks = total_blocks // survey_block_ratio
+    rows_per_block = 30  # Standard assumption
+    survey_rows = rows_per_block // row_sampling_ratio
+    palms_surveyed = survey_blocks * survey_rows * (rows_per_block // row_sampling_ratio)
+    
+    st.write(f"Number of blocks to survey: {survey_blocks}")
+    st.write(f"Number of rows to survey per block: {survey_rows}")
+    st.write(f"Total palms to be surveyed: {palms_surveyed}")
+    
+    black_bunches = st.number_input("Total black bunches counted", min_value=0, value=100)
+    
+    if black_bunches > 0:
+        bunches_per_palm = black_bunches / palms_surveyed
+        st.write(f"Average black bunches per palm: {bunches_per_palm:.2f}")
+    
+    # Distribution fractions
+    st.header("Monthly Distribution")
+    st.write("Enter the expected distribution of bunch ripening over the next 4 months (must sum to 1.0)")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        month1_dist = st.number_input("Month 1", min_value=0.0, max_value=1.0, value=0.3)
+    with col2:
+        month2_dist = st.number_input("Month 2", min_value=0.0, max_value=1.0, value=0.3)
+    with col3:
+        month3_dist = st.number_input("Month 3", min_value=0.0, max_value=1.0, value=0.25)
+    with col4:
+        month4_dist = st.number_input("Month 4", min_value=0.0, max_value=1.0, value=0.15)
+    
+    distribution_sum = month1_dist + month2_dist + month3_dist + month4_dist
+    if abs(distribution_sum - 1.0) > 0.001:
+        st.warning(f"Distribution fractions sum to {distribution_sum:.2f}. They should sum to 1.0")
+    
+    distribution_fractions = [month1_dist, month2_dist, month3_dist, month4_dist]
+    
+    # Calculate forecast
+    if st.button("Calculate Forecast"):
+        if black_bunches > 0:
+            total_palms = total_blocks * palms_per_block
+            bunches_per_palm = black_bunches / palms_surveyed
+            
+            # Calculate forecast
+            forecast = calculate_forecast(
+                bunches_per_palm,
+                bunch_weight,
+                total_palms,
+                distribution_fractions,
+                loss_rate
+            )
+            
+            # Display results
+            st.header("Forecast Results")
+            
+            # Create forecast dates
+            current_date = datetime.now()
+            dates = [(current_date + timedelta(days=30*i)).strftime('%B %Y') for i in range(1, 5)]
+            
+            # Create forecast dataframe
+            forecast_df = pd.DataFrame({
+                'Month': dates,
+                'Expected Production (tonnes)': forecast,
+                'Distribution (%)': [d*100 for d in distribution_fractions]
+            })
+            
+            st.dataframe(forecast_df.style.format({
+                'Expected Production (tonnes)': '{:.1f}',
+                'Distribution (%)': '{:.1f}%'
+            }))
+            
+            # Total forecast
+            st.write(f"Total 4-month forecast: {sum(forecast):.1f} tonnes")
+            
+            # Create a simple bar chart
+            st.bar_chart(data=pd.DataFrame({
+                'Month': dates,
+                'Tonnes': forecast
+            }).set_index('Month'))
+
+if __name__ == "__main__":
     main()
