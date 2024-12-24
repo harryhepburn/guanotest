@@ -18,8 +18,10 @@ def calculate_fertilizer():
         st.write("1. Masukkan maklumat untuk setiap pusingan pembajaan.")
         st.write("2. Masukkan bilangan pokok sawit per hektar dan jumlah kawasan.")
         st.write("3. Klik butang 'Kira Keperluan Baja' untuk melihat hasilnya.")
-        st.write("### Pembangun:")
-        st.write("Rafizan Samian, Jabatan SS")
+        st.write("### Dibangunkan Oleh:")
+        st.write("Rafizan Samian 
+            Jabatan Strategi dan Transformasi
+            FELDA")
 
     # Input rounds of fertilization
     num_rounds = st.number_input("Bilangan pusingan pembajaan:", min_value=1, step=1, value=1)
