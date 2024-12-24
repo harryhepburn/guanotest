@@ -168,7 +168,7 @@ def main():
             'Tan': [p['Anggaran Hasil (Tan)'] for p in monthly_projections]
         }).set_index('Bulan'))
 
-[Previous code remains the same until the main() function's end, then add:]
+
 
     # Add BBC Guidelines in Sidebar
     st.sidebar.header("Panduan Bancian BBC")
