@@ -197,11 +197,11 @@ def main():
     
     # Create classification table
     classification_data = {
-        'Bulan': ['1', '2', '3*', '4*', '5*'],
-        'Kedudukan': ['20-21', '22-23', '24-25', '26-27', '28-29'],
-        'Warna': ['Hijau ke Hitam', 'Hitam', 'Hitam', 'Hitam ke Merah', 'Merah ke Oren'],
-        'Selaput': ['25%', '50%', '80%', '90%', '95%'],
-        'Bulan Dijangka': ['5 Bulan', '4 Bulan', '3 Bulan', '2 Bulan', '1 Bulan']
+        'Bulan Selepas Pendebungaan': ['1', '2', '3*', '4*', '5*'],
+        'Kedudukan di Pelepah': ['20-21', '22-23', '24-25', '26-27', '28-29'],
+        'Warna Tandan': ['Hijau ke Hitam', 'Hitam', 'Hitam', 'Hitam ke Merah', 'Merah ke Oren'],
+        'Peratus Selaput Terbuka': ['25%', '50%', '80%', '90%', '95%'],
+        'Jangkaan Waktu Tuaian': ['5 Bulan', '4 Bulan', '3 Bulan', '2 Bulan', '1 Bulan']
     }
     
     st.sidebar.dataframe(pd.DataFrame(classification_data))
