@@ -24,7 +24,7 @@ def calculate_bunch_distribution(bunch_3_month, bunch_4_month, bunch_5_month, to
     
     # Calculate percentages
     percentages = [
-        bunch_5_month / total_bunches,  # Will mature in 1 month
+        bunch_5_month / total_bunches,  # Will mature next month
         bunch_4_month / total_bunches,  # Will mature in 2 months
         bunch_3_month / total_bunches   # Will mature in 3 months
     ]
@@ -37,6 +37,23 @@ def calculate_bunch_distribution(bunch_3_month, bunch_4_month, bunch_5_month, to
         'avg_bunches_per_tree': avg_bunches,
         'percentages': [bunch_5_month, bunch_4_month, bunch_3_month]
     }
+
+def get_forecast_months():
+    """Get the next three months starting from next month"""
+    current_date = datetime.now()
+    # Start from the first day of next month
+    if current_date.month == 12:
+        next_month = datetime(current_date.year + 1, 1, 1)
+    else:
+        next_month = datetime(current_date.year, current_date.month + 1, 1)
+    
+    months = []
+    for i in range(3):
+        month_date = next_month + timedelta(days=32*i)
+        # Ensure we're getting the first day of each month
+        month_date = month_date.replace(day=1)
+        months.append(month_date.strftime('%B %Y'))
+    return months
 
 def main():
     st.title("Ramalan Hasil Kelapa Sawit - Kiraan Tandan Hitam (BBC)")
@@ -91,6 +108,9 @@ def main():
         bunch_3_month, bunch_4_month, bunch_5_month, actual_surveyed_trees
     )
 
+    # Get forecast months
+    forecast_months = get_forecast_months()
+
     # Display bunch statistics
     st.header("4. Analisis Bancian")
     col1, col2 = st.columns(2)
@@ -98,7 +118,11 @@ def main():
     with col1:
         st.subheader("Taburan Tandan")
         bunch_df = pd.DataFrame({
-            'Peringkat': ['5 Bulan (Bulan 1)', '4 Bulan (Bulan 2)', '3 Bulan (Bulan 3)'],
+            'Peringkat': [
+                f'5 Bulan ({forecast_months[0]})', 
+                f'4 Bulan ({forecast_months[1]})', 
+                f'3 Bulan ({forecast_months[2]})'
+            ],
             'Jumlah Tandan': [bunch_5_month, bunch_4_month, bunch_3_month],
             'Peratusan (%)': [f"{x*100:.1f}%" for x in bunch_stats['distribution']]
         })
@@ -117,15 +141,13 @@ def main():
         
         # Calculate monthly projections
         monthly_projections = []
-        current_date = datetime.now()
         
-        for i, dist in enumerate(bunch_stats['distribution']):
-            month_date = (current_date + timedelta(days=30*i)).strftime('%B %Y')
+        for i, (month, dist) in enumerate(zip(forecast_months, bunch_stats['distribution'])):
             month_bunches = total_projected_bunches * dist
             month_tonnes = (month_bunches * bunch_weight * (1 - loss_rate)) / 1000
             
             monthly_projections.append({
-                'Bulan': month_date,
+                'Bulan': month,
                 'Anggaran Tandan': int(month_bunches),
                 'Anggaran Hasil (Tan)': month_tonnes
             })
