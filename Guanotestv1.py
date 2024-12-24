@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import math
 
 def calculate_fertilizer():
@@ -17,8 +18,8 @@ def calculate_fertilizer():
         st.write("1. Masukkan maklumat untuk setiap pusingan pembajaan.")
         st.write("2. Masukkan bilangan pokok sawit per hektar dan jumlah kawasan.")
         st.write("3. Klik butang 'Kira Keperluan Baja' untuk melihat hasilnya.")
-        st.write("### Dibangunkan Oleh:")
-        st.write("Rafizan Samian, Jabatan Strategi dan Tranformasi FELDA")
+        st.write("### Pembangun:")
+        st.write("Rafizan Samian, Jabatan SS")
 
     # Input rounds of fertilization
     num_rounds = st.number_input("Bilangan pusingan pembajaan:", min_value=1, step=1, value=1)
@@ -47,25 +48,41 @@ def calculate_fertilizer():
             st.success(f"Jumlah pokok sawit: {total_palms}")
 
             total_cost = 0.0
+            results = []
 
             for i, data in enumerate(fertilizer_data):
-                st.write(f"### Keputusan untuk Pusingan {i + 1} ({data['type']})")
-                
                 if data['amount_per_palm'] > 0:
                     total_fertilizer_kg = (data['amount_per_palm'] * total_palms) / 1000  # Convert grams to kg
-                    st.write(f"Jumlah baja diperlukan: {total_fertilizer_kg:.2f} kg")
-
-                    # Calculate bags needed (50kg only)
-                    bags_needed = math.ceil(total_fertilizer_kg / 50)
-                    st.write(f"Jumlah beg (saiz 50kg): {bags_needed}")
+                    bags_needed = math.ceil(total_fertilizer_kg / 50)  # Calculate bags needed (50kg only)
 
                     # Calculate cost
-                    if data['price_per_bag'] > 0:
-                        cost = bags_needed * data['price_per_bag']
-                        st.write(f"Kos keseluruhan (pusingan {i + 1}): RM {cost:.2f}")
-                        total_cost += cost
+                    cost = bags_needed * data['price_per_bag'] if data['price_per_bag'] > 0 else 0
+                    total_cost += cost
 
+                    results.append({
+                        "Pusingan": i + 1,
+                        "Jenis Baja": data['type'],
+                        "Jumlah Baja (kg)": total_fertilizer_kg,
+                        "Jumlah Beg (50kg)": bags_needed,
+                        "Kos (RM)": cost,
+                    })
+
+            # Display results as a table
+            results_df = pd.DataFrame(results)
+            st.write("## Keputusan Pembajaan")
+            st.dataframe(results_df, use_container_width=True)
+
+            # Total cost
             st.write(f"## 💵 Jumlah Kos Keseluruhan: RM {total_cost:.2f}")
+
+            # Download option
+            csv = results_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Muat Turun Keputusan",
+                data=csv,
+                file_name="keputusan_pembajaan.csv",
+                mime="text/csv",
+            )
         else:
             st.error("Sila masukkan bilangan pokok dan keluasan kawasan dengan betul.")
 
