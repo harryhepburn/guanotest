@@ -7,17 +7,29 @@ def calculate_fertilizer():
     st.title("Kalkulator Keperluan Baja Kelapa Sawit 🌾")
     st.write("Selamat datang ke aplikasi kalkulator baja! Aplikasi ini membantu anda mengira keperluan baja untuk ladang kelapa sawit dengan mudah dan pantas.")
 
+    # Sidebar information
+    with st.sidebar:
+        st.header("Tentang Aplikasi")
+        st.write(
+            "Aplikasi ini direka untuk membantu pekebun kelapa sawit mengira jumlah keperluan baja, bilangan beg baja, dan kos keseluruhan berdasarkan maklumat yang dimasukkan."
+        )
+        st.write("### Cara Penggunaan:")
+        st.write("1. Masukkan maklumat untuk setiap pusingan pembajaan.")
+        st.write("2. Masukkan bilangan pokok sawit per hektar dan jumlah kawasan.")
+        st.write("3. Klik butang 'Kira Keperluan Baja' untuk melihat hasilnya.")
+        st.write("### Pembangun:")
+        st.write("Rafizan Samian, Jabatan SS")
+
     # Input rounds of fertilization
-    st.sidebar.header("Maklumat Pembajaan")
-    num_rounds = st.sidebar.number_input("Bilangan pusingan pembajaan:", min_value=1, step=1, value=1)
+    num_rounds = st.number_input("Bilangan pusingan pembajaan:", min_value=1, step=1, value=1)
 
     fertilizer_data = []
 
     for i in range(1, num_rounds + 1):
-        st.sidebar.write(f"### Pusingan {i}")
-        fertilizer_type = st.sidebar.text_input(f"Jenis baja untuk pusingan {i}:", key=f"fertilizer_type_{i}")
-        amount_per_palm = st.sidebar.number_input(f"Jumlah baja per pokok (gram):", min_value=0.0, step=0.1, value=0.0, key=f"amount_per_palm_{i}")
-        price_per_bag = st.sidebar.number_input(f"Harga satu beg baja (RM):", min_value=0.0, step=0.1, value=0.0, key=f"price_per_bag_{i}")
+        st.write(f"### Pusingan {i}")
+        fertilizer_type = st.text_input(f"Jenis baja untuk pusingan {i}:", key=f"fertilizer_type_{i}")
+        amount_per_palm = st.number_input(f"Jumlah baja per pokok (gram):", min_value=0.0, step=0.1, value=0.0, key=f"amount_per_palm_{i}")
+        price_per_bag = st.number_input(f"Harga satu beg baja (RM):", min_value=0.0, step=0.1, value=0.0, key=f"price_per_bag_{i}")
         fertilizer_data.append({
             "type": fertilizer_type,
             "amount_per_palm": amount_per_palm,
@@ -25,9 +37,9 @@ def calculate_fertilizer():
         })
 
     # Input number of palms and area size
-    st.sidebar.header("Maklumat Ladang")
-    num_palms_per_hectare = st.sidebar.number_input("Bilangan pokok sawit per hektar:", min_value=0, step=1, value=0)
-    total_area = st.sidebar.number_input("Jumlah kawasan (hektar):", min_value=0.0, step=0.1, value=0.0)
+    st.write("## Maklumat Ladang")
+    num_palms_per_hectare = st.number_input("Bilangan pokok sawit per hektar:", min_value=0, step=1, value=0)
+    total_area = st.number_input("Jumlah kawasan (hektar):", min_value=0.0, step=0.1, value=0.0)
 
     if st.button("🌱 Kira Keperluan Baja"):
         if total_area > 0 and num_palms_per_hectare > 0:
