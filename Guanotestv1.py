@@ -168,5 +168,54 @@ def main():
             'Tan': [p['Anggaran Hasil (Tan)'] for p in monthly_projections]
         }).set_index('Bulan'))
 
+[Previous code remains the same until the main() function's end, then add:]
+
+    # Add BBC Guidelines in Sidebar
+    st.sidebar.header("Panduan Bancian BBC")
+    
+    # Schedule information
+    st.sidebar.subheader("Jadual Bancian")
+    schedule_data = {
+        'Pusingan': [1, 2, 3, 4],
+        'Bulan Dijalankan': ['Disember', 'Mac', 'Jun', 'September'],
+        'Anggaran Hasil': ['Jan - Mac', 'April - Jun', 'Julai - September', 'Oktober - Disember']
+    }
+    st.sidebar.dataframe(pd.DataFrame(schedule_data))
+    
+    st.sidebar.markdown("""
+    #### Panduan Umum
+    1. Bancian dijalankan 4 kali setahun
+    2. Luas kawasan bancian: 5% daripada jumlah kawasan
+    3. Baris bancian bermula dari baris #3 dari tepi sempadan/jalan
+    
+    #### Panduan Bancian Tandan
+    1. Kira tandan pada bulan ke-3 dan ke atas selepas pendebungaan
+    2. Tandan berkilat biasanya dilihat pada pelepah 24-25
+    
+    #### Klasifikasi Tandan Selepas Anthesis
+    """)
+    
+    # Create classification table
+    classification_data = {
+        'Bulan': ['1', '2', '3*', '4*', '5*'],
+        'Kedudukan': ['20-21', '22-23', '24-25', '26-27', '28-29'],
+        'Warna': ['Hijau ke Hitam', 'Hitam', 'Hitam', 'Hitam ke Merah', 'Merah ke Oren'],
+        'Selaput': ['25%', '50%', '80%', '90%', '95%'],
+        'Bulan Dijangka': ['5 Bulan', '4 Bulan', '3 Bulan', '2 Bulan', '1 Bulan']
+    }
+    
+    st.sidebar.dataframe(pd.DataFrame(classification_data))
+    
+    st.sidebar.markdown("""
+    *Tandan yang diambilkira dalam bancian
+    
+    #### Nota Penting
+    - Pemerhatian tandan hitam bermula pada pelepah 24-25
+    - Peratus selaput terbuka menunjukkan kematangan tandan
+    - Ramalan hasil berdasarkan tandan yang ditemui pada peringkat 3-5 bulan selepas pendebungaan
+    """)
+
 if __name__ == "__main__":
     main()
+
+
